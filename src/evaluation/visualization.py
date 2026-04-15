@@ -96,18 +96,30 @@ def plot_metrics(csv_path="data/processed/optimized_results.csv", output_dir="da
         metrics_data[f'{metric}_std'] = stds
         
     plot_df = pd.DataFrame(metrics_data)
-    colors = ['#4A90E2', '#50E3C2', '#F5A623', '#D0021B'] # LoRA用红色
+    num_models = len(plot_df)
+
+    # 动态扩展 colors 列表，确保颜色数量足够，并强制将最后一个颜色设置为醒目的红色
+    base_palettes = sns.color_palette("muted", n_colors=max(num_models, 1)).as_hex()
+    colors = list(base_palettes)
+    if num_models > 0:
+        colors[-1] = '#D0021B'
 
     # --- 1. 绘制分组柱状图 ---
     fig, ax = plt.subplots(figsize=(12, 7), dpi=300)
     x = np.arange(len(metrics))
-    width = 0.2
+    
+    # 动态计算合身的 width
+    width = 0.8 / num_models if num_models > 0 else 0.8
 
     for i, row in plot_df.iterrows():
         means = [row[m] for m in metrics]
         stds = [row[f'{m}_std'] for m in metrics]
-        ax.bar(x + (i - 1.5) * width, means, width, yerr=stds, label=row['Model'], 
-               color=colors[i % len(colors)], capsize=5, alpha=0.9, edgecolor='white', linewidth=1)
+        
+        # 动态计算 ax.bar 的 x 轴居中偏移量
+        offset = (i - (num_models - 1) / 2.0) * width
+        
+        ax.bar(x + offset, means, width, yerr=stds, label=row['Model'], 
+               color=colors[i], capsize=5, alpha=0.9, edgecolor='white', linewidth=1)
 
     ax.set_ylabel('Scores', fontsize=14, fontweight='bold')
     ax.set_title('Performance Comparison of Different Models (5-Fold CV)', fontsize=16, fontweight='bold', pad=20)

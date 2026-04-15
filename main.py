@@ -324,7 +324,10 @@ def main():
     # --- Step 4: 评估与可视化 (待后续完善) ---
     if args.step in ['all', 'evaluate']:
         logging.info("--- Step 4: Evaluation & Visualization ---")
-        pass
+        from src.evaluation.visualization import plot_metrics
+        csv_path = os.path.join(PROCESSED_DATA_DIR, "optimized_results.csv")
+        plot_metrics(csv_path=csv_path, output_dir=PROCESSED_DATA_DIR)
+        logging.info("图表已成功生成")
 
     logging.info("Pipeline completed successfully.")
 

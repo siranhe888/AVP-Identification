@@ -4,6 +4,5 @@ Traditional (434D),Random Forest,"{'max_depth': None, 'min_samples_split': 2, 'n
 Deep (ESM-2 640D),XGBoost,"{'learning_rate': 0.05632306994902839, 'max_depth': 7, 'subsample': 0.8351216700340434, 'reg_alpha': 0.021253216150193825, 'reg_lambda': 0.0032226074192310355}",0.8761 ± 0.0161,0.8894 ± 0.0088,0.8628 ± 0.0276,0.7526 ± 0.0316,0.9427 ± 0.0101
 Deep (ESM-2 640D),ESM-2 LoRA Finetuned,"{'r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': ['query', 'key', 'value', 'dense'], 'learning_rate': 0.0002, 'train_batch_size': 4, 'epochs': 10}",0.8928 ± 0.0171,0.9014 ± 0.0185,0.8842 ± 0.0200,0.7858 ± 0.0341,0.9477 ± 0.0113
 Deep (GRUATTNet),GRUATTNet,"{'learning_rate': 0.0002, 'train_batch_size': 4, 'epochs': 10}",0.8636 ± 0.0128,0.8533 ± 0.0356,0.8739 ± 0.0202,0.7282 ± 0.0255,0.9313 ± 0.0095
-Deep (PeptideNet),PeptideNet,"{'learning_rate': 0.0002, 'train_batch_size': 4, 'epochs': 10}",0.8619 ± 0.0200,0.8765 ± 0.0620,0.8474 ± 0.0537,0.7276 ± 0.0395,0.9320 ± 0.0163
 Deep (PeptideNet),PeptideNet,"{'learning_rate': 0.0002, 'train_batch_size': 128, 'epochs': 10}",0.8529 ± 0.0115,0.8653 ± 0.0215,0.8405 ± 0.0210,0.7064 ± 0.0228,0.9094 ± 0.0163
 Deep (UniDL4BioPep),UniDL4BioPep,"{'learning_rate': 0.0002, 'train_batch_size': 64, 'epochs': 10}",0.8611 ± 0.0101,0.8756 ± 0.0173,0.8465 ± 0.0128,0.7226 ± 0.0204,0.9243 ± 0.0163
