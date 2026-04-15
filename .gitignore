@@ -15,7 +15,6 @@ build/
 *.pt
 *.pth
 *.bin
-models/
 baseline_*_weights/
 lora_weights/
 
