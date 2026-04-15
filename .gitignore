@@ -1,0 +1,52 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ===== Jupyter Notebook =====
+.ipynb_checkpoints/
+*.ipynb
+
+# ===== PyTorch 模型权重 =====
+*.pt
+*.pth
+*.bin
+models/
+baseline_*_weights/
+lora_weights/
+
+# ===== 数据文件 (视需要调整) =====
+data/processed/*.csv
+data/processed/*.fasta
+data/raw/*.fasta
+data/raw/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ===== HuggingFace 缓存 =====
+.cache/
+
+# ===== 环境与IDE =====
+.env
+.venv/
+env/
+venv/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== 日志 =====
+*.log
+
+# ===== MMseqs2 临时文件 =====
+data/processed/tmp_*/
