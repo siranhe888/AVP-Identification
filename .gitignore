@@ -19,10 +19,10 @@ baseline_*_weights/
 lora_weights/
 
 # ===== 数据文件 (视需要调整) =====
-data/processed/*.csv
-data/processed/*.fasta
-data/raw/*.fasta
-data/raw/*.csv
+# data/processed/*.csv
+# data/processed/*.fasta
+# data/raw/*.fasta
+# data/raw/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
