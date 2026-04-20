@@ -10,26 +10,28 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, cross_val_score
-from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score
+from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score, f1_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import optuna
 
 def calculate_bio_metrics(y_true, y_pred, y_prob):
-    """计算生物信息学常用指标：ACC, Sn, Sp, MCC, AUC"""
+    """计算生物信息学常用指标：ACC, Sn, Sp, MCC, AUC, F1"""
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     acc = accuracy_score(y_true, y_pred)
     sn = tp / (tp + fn) if (tp + fn) > 0 else 0.0  # Sensitivity / Recall
     sp = tn / (tn + fp) if (tn + fp) > 0 else 0.0  # Specificity
     mcc = matthews_corrcoef(y_true, y_pred)
     auc = roc_auc_score(y_true, y_prob)
+    f1 = f1_score(y_true, y_pred)
     
     return {
         'ACC': acc,
         'Sn': sn,
         'Sp': sp,
         'MCC': mcc,
-        'AUC': auc
+        'AUC': auc,
+        'F1': f1
     }
 
 def run_5fold_cv(model, X: np.ndarray, y: np.ndarray, model_name: str) -> dict:
@@ -62,7 +64,7 @@ def run_5fold_cv(model, X: np.ndarray, y: np.ndarray, model_name: str) -> dict:
     std_metrics = df_metrics.std().to_dict()
     
     result = {}
-    for metric in ['ACC', 'Sn', 'Sp', 'MCC', 'AUC']:
+    for metric in ['ACC', 'Sn', 'Sp', 'MCC', 'AUC', 'F1']:
         result[metric] = mean_metrics[metric]
         result[f"{metric}_std"] = std_metrics[metric]
         
@@ -183,5 +185,6 @@ def format_results(name: str, best_params: dict, metrics: dict, group_name: str)
         'Sn': f"{metrics['Sn']:.4f} ± {metrics['Sn_std']:.4f}",
         'Sp': f"{metrics['Sp']:.4f} ± {metrics['Sp_std']:.4f}",
         'MCC': f"{metrics['MCC']:.4f} ± {metrics['MCC_std']:.4f}",
-        'AUC': f"{metrics['AUC']:.4f} ± {metrics['AUC_std']:.4f}"
+        'AUC': f"{metrics['AUC']:.4f} ± {metrics['AUC_std']:.4f}",
+        'F1': f"{metrics['F1']:.4f} ± {metrics['F1_std']:.4f}"
     }

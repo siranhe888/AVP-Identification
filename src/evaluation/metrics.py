@@ -3,7 +3,7 @@
 """
 
 import numpy as np
-from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score
+from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score, f1_score
 
 def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray) -> dict:
     """
@@ -31,12 +31,16 @@ def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray
     # ROC-AUC
     auc = roc_auc_score(y_true, y_prob)
     
+    # Compute F1 Score using sklearn
+    from sklearn.metrics import f1_score
+    f1 = f1_score(y_true, y_pred)
     metrics = {
         "Accuracy (ACC)": acc,
         "Matthews Correlation Coefficient (MCC)": mcc,
         "Sensitivity (Sn)": sn,
         "Specificity (Sp)": sp,
-        "Area Under Curve (AUC)": auc
+        "Area Under Curve (AUC)": auc,
+        "F1 Score (F1)": f1
     }
     
     return metrics
