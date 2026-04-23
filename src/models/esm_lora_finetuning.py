@@ -8,7 +8,7 @@ import numpy as np
 from transformers import AutoTokenizer, EsmModel, get_cosine_schedule_with_warmup
 from peft import get_peft_model, LoraConfig
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score
+from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score, f1_score
 from tqdm import tqdm
 
 # ==========================================
@@ -134,20 +134,22 @@ class AVPDataset(Dataset):
 # 4. 生信指标计算函数
 # ==========================================
 def calculate_bio_metrics(y_true, y_pred, y_prob):
-    """计算生物信息学常用指标：ACC, Sn, Sp, MCC, AUC"""
+    """计算生物信息学常用指标：ACC, Sn, Sp, MCC, AUC, F1"""
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     acc = accuracy_score(y_true, y_pred)
     sn = tp / (tp + fn) if (tp + fn) > 0 else 0.0  # Sensitivity / Recall
     sp = tn / (tn + fp) if (tn + fp) > 0 else 0.0  # Specificity
     mcc = matthews_corrcoef(y_true, y_pred)
     auc = roc_auc_score(y_true, y_prob)
+    f1 = f1_score(y_true, y_pred)
     
     return {
         'ACC': acc,
         'Sn': sn,
         'Sp': sp,
         'MCC': mcc,
-        'AUC': auc
+        'AUC': auc,
+        'F1': f1
     }
 
 # ==========================================
@@ -330,7 +332,7 @@ def run_lora_finetuning(dataset_path, output_dir="models/lora_weights"):
     std_metrics = df_metrics.std().to_dict()
     
     result_metrics = {}
-    for metric in ['ACC', 'Sn', 'Sp', 'MCC', 'AUC']:
+    for metric in ['ACC', 'Sn', 'Sp', 'MCC', 'AUC', 'F1']:
         result_metrics[metric] = mean_metrics[metric]
         result_metrics[f"{metric}_std"] = std_metrics[metric]
         

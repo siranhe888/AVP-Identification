@@ -80,10 +80,7 @@ def plot_metrics(csv_path="data/processed/optimized_results.csv", output_dir="da
     models = df['Model'].tolist()
     
     # Dynamically determine which metrics are available in the CSV
-    base_metrics = ['ACC', 'Sn', 'Sp', 'MCC', 'AUC']
-    metrics = [m for m in base_metrics if m in df.columns]
-    if 'F1' in df.columns:
-        metrics.append('F1')
+    metrics = ['ACC', 'Sn', 'Sp', 'MCC', 'AUC', 'F1']
     # Ensure metrics list is not empty
     if not metrics:
         print('No metric columns found in the CSV.')
@@ -152,7 +149,7 @@ def plot_metrics(csv_path="data/processed/optimized_results.csv", output_dir="da
     ax.set_theta_offset(pi / 2)
     ax.set_theta_direction(-1)
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels([m if m != 'ACC' else 'Accuracy' for m in metrics], fontsize=12, fontweight='bold')
+    ax.set_xticklabels(['Accuracy', 'Sensitivity', 'Specificity', 'MCC', 'AUC', 'F1 Score'], fontsize=12, fontweight='bold')
     ax.set_rlabel_position(0)
     plt.yticks([0.7, 0.8, 0.9, 1.0], ["0.7", "0.8", "0.9", "1.0"], color="grey", size=10)
     plt.ylim(0.7, 1.0)

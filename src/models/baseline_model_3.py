@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer, EsmModel, get_cosine_schedule_with_warmup
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score
+from sklearn.metrics import accuracy_score, matthews_corrcoef, confusion_matrix, roc_auc_score, f1_score
 from tqdm import tqdm
 
 # ==========================================
@@ -75,13 +75,15 @@ def calculate_bio_metrics(y_true, y_pred, y_prob):
     sp = tn / (tn + fp) if (tn + fp) > 0 else 0.0
     mcc = matthews_corrcoef(y_true, y_pred)
     auc = roc_auc_score(y_true, y_prob)
+    f1 = f1_score(y_true, y_pred)
     
     return {
         'ACC': acc,
         'Sn': sn,
         'Sp': sp,
         'MCC': mcc,
-        'AUC': auc
+        'AUC': auc,
+        'F1': f1
     }
 
 # ==========================================
@@ -293,7 +295,7 @@ def run_baseline_3(dataset_path, output_dir="models/baseline_3_weights"):
     std_metrics = df_metrics.std().to_dict()
     
     result_metrics = {}
-    for metric in ['ACC', 'Sn', 'Sp', 'MCC', 'AUC']:
+    for metric in ['ACC', 'Sn', 'Sp', 'MCC', 'AUC', 'F1']:
         result_metrics[metric] = mean_metrics[metric]
         result_metrics[f"{metric}_std"] = std_metrics[metric]
         
