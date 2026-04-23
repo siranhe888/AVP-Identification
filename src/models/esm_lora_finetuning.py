@@ -45,14 +45,14 @@ class ESM2LoRAClassifier(nn.Module):
     """
     基于 ESM-2 的端到端微调模型，包含动态均值池化和自定义分类头。
     """
-    def __init__(self, model_name="facebook/esm2_t30_150M_UR50D"):
+    def __init__(self, model_name="facebook/esm2_t30_150M_UR50D", lora_r: int = 8):
         super(ESM2LoRAClassifier, self).__init__()
         # 1. 加载预训练基座模型 (不要自带的分类头)
         self.esm = EsmModel.from_pretrained(model_name)
         
         # 2. 配置 LoraConfig
         lora_config = LoraConfig(
-            r=8,
+            r=lora_r,
             lora_alpha=16,
             target_modules=["query", "key", "value", "dense"], # 微调注意力层和全连接层以唤醒进化特征
             lora_dropout=0.1,
@@ -155,7 +155,7 @@ def calculate_bio_metrics(y_true, y_pred, y_prob):
 # ==========================================
 # 5. 训练管线：严谨的 5-Fold 微调流程
 # ==========================================
-def run_lora_finetuning(dataset_path, output_dir="models/lora_weights"):
+def run_lora_finetuning(dataset_path, output_dir="data/processed/lora_weights", lora_r: int = 8):
     """执行基于 LoRA 的大语言模型端到端微调 (5-Fold CV)"""
     # 自动检测 CUDA
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -197,7 +197,7 @@ def run_lora_finetuning(dataset_path, output_dir="models/lora_weights"):
         val_loader = DataLoader(val_dataset, batch_size=val_batch_size, shuffle=False)
         
         # 初始化模型
-        model = ESM2LoRAClassifier(model_name=model_name).to(device)
+        model = ESM2LoRAClassifier(model_name=model_name, lora_r=lora_r).to(device)
         
         # 优化器与损失函数
         optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
@@ -339,7 +339,7 @@ def run_lora_finetuning(dataset_path, output_dir="models/lora_weights"):
     logging.info(f"LoRA Finetuning 5-Fold CV Completed. Avg AUC: {result_metrics['AUC']:.4f} ± {result_metrics['AUC_std']:.4f}")
     
     params = {
-        'r': 8,
+        'r': lora_r,
         'lora_alpha': 16,
         'lora_dropout': 0.1,
         'target_modules': ["query", "key", "value", "dense"],
@@ -349,3 +349,32 @@ def run_lora_finetuning(dataset_path, output_dir="models/lora_weights"):
     }
     
     return "ESM-2 LoRA Finetuned", params, result_metrics
+
+# ==========================================
+# 6. Rank 消融实验
+# ==========================================
+def run_rank_ablation(dataset_path):
+    """运行 ESM-2 LoRA Rank 参数的消融实验"""
+    rank_list = [4, 8, 16, 32]
+    all_results = []
+    
+    for r in rank_list:
+        logging.info(f"=== Starting Ablation for LoRA Rank: {r} ===")
+        # 调用 run_lora_finetuning
+        name, params, metrics = run_lora_finetuning(
+            dataset_path=dataset_path, 
+            output_dir=f"data/processed/lora_weights_r{r}", 
+            lora_r=r
+        )
+        # 收集结果
+        result_dict = {'Rank': r}
+        result_dict.update(metrics)
+        all_results.append(result_dict)
+        
+    # 保存至 CSV
+    df_ablation = pd.DataFrame(all_results)
+    output_csv = "data/processed/ablation_rank_results.csv"
+    os.makedirs(os.path.dirname(output_csv), exist_ok=True)
+    df_ablation.to_csv(output_csv, index=False)
+    logging.info(f"Rank 消融实验完成，结果已保存至 {output_csv}")
+    return output_csv

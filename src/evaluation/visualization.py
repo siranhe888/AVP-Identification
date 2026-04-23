@@ -175,6 +175,43 @@ def plot_metrics(csv_path="data/processed/optimized_results.csv", output_dir="da
     plt.close()
     print("模型对比柱状图和雷达图已生成！")
 
+def plot_ablation_results(csv_path="data/processed/ablation_rank_results.csv", output_dir="data/processed/"):
+    """绘制 LoRA Rank 消融实验折线图"""
+    if not os.path.exists(csv_path):
+        print(f"未找到消融实验数据文件 {csv_path}")
+        return
+        
+    print("正在绘制消融实验折线图...")
+    df = pd.read_csv(csv_path)
+    
+    metrics = ['MCC', 'AUC', 'F1', 'ACC']
+    
+    plt.figure(figsize=(10, 6), dpi=300)
+    
+    for metric in metrics:
+        if metric in df.columns:
+            sns.lineplot(x='Rank', y=metric, data=df, marker='o', label=metric, linewidth=2, markersize=8)
+            
+    plt.title("Ablation Study: LoRA Rank vs Performance", fontsize=16, fontweight='bold')
+    plt.xlabel("LoRA Rank (r)", fontsize=12)
+    plt.ylabel("Score", fontsize=12)
+    
+    # 设置 X 轴的刻度为实际的 Rank 值
+    plt.xticks(df['Rank'].unique())
+    
+    plt.legend(title="Metrics")
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # 去除顶部和右侧边框
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
+    
+    plt.tight_layout()
+    save_path = os.path.join(output_dir, 'ablation_rank_chart.png')
+    plt.savefig(save_path)
+    plt.close()
+    print(f"消融实验折线图已保存至: {save_path}")
+
 if __name__ == "__main__":
     # 测试执行性能对比图生成
     plot_metrics()

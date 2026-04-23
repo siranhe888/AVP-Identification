@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def parse_args():
     """解析命令行参数"""
     parser = argparse.ArgumentParser(description="AVP Identification Pipeline")
-    parser.add_argument('--step', type=str, choices=['all', 'download', 'preprocess', 'feature', 'train', 'lora', 'b1', 'b2', 'b3', 'evaluate'],
+    parser.add_argument('--step', type=str, choices=['all', 'download', 'preprocess', 'feature', 'train', 'lora', 'b1', 'b2', 'b3', 'evaluate', 'ablation'],
                         default='all', help='Pipeline step to run')
     return parser.parse_args()
 
@@ -320,6 +320,20 @@ def main():
         print("="*100)
         print(updated_df.to_string(index=False))
         print("="*100 + "\n")
+
+    # --- Step 3.9: ESM-2 LoRA Rank 参数消融实验 ---
+    if args.step in ['all', 'ablation']:
+        logging.info("--- Step 3.9: ESM-2 LoRA Rank Ablation ---")
+        if not os.path.exists(final_dataset_csv):
+            logging.error(f"错误：找不到数据集 {final_dataset_csv}。请先运行 --step preprocess")
+            return
+            
+        from src.models.esm_lora_finetuning import run_rank_ablation
+        from src.evaluation.visualization import plot_ablation_results
+        
+        logging.info("Starting ESM-2 LoRA Rank Ablation Study...")
+        run_rank_ablation(final_dataset_csv)
+        plot_ablation_results()
 
     # --- Step 4: 评估与可视化 (待后续完善) ---
     if args.step in ['all', 'evaluate']:
